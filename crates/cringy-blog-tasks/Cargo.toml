@@ -13,3 +13,7 @@ anyhow = { version = "1.0.66", features = ["std"] }
 dotenv = "0.15.0"
 derive_more = "0.99.17"
 async-trait = "0.1.58"
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0.89"
+uuid = { version = "1.2.2", features = ["serde", "v4"] }
+chrono = { version = "0.4.23", features = ["serde"] }

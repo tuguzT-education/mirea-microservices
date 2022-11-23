@@ -5,11 +5,16 @@
 #![forbid(unsafe_code)]
 
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use axum::{Router, Server};
+use chrono::{Duration, Utc};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use uuid::Uuid;
 
+use self::data::model::CreateTask;
+use self::data::repository::{DynTaskRepository, InMemoryTaskRepository};
 use self::route::task;
 
 pub mod data;
@@ -29,9 +34,17 @@ async fn main() -> anyhow::Result<()> {
         .with(tracing_subscriber::fmt::layer())
         .try_init()?;
 
+    let task_repo = Arc::new(InMemoryTaskRepository::default()) as DynTaskRepository;
+    let new_task = CreateTask {
+        blog_id: Uuid::new_v4(),
+        name: "New task".to_string(),
+        deadline: Some(Utc::now() + Duration::days(1)),
+    };
+    task_repo.create_one(new_task).await?;
     let app = Router::new()
         .merge(task::all_merged())
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .with_state(task_repo);
 
     let addr = &SocketAddr::from(([127, 0, 0, 1], 8080));
     tracing::debug!("listening on {}", addr);
