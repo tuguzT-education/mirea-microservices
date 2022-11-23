@@ -3,6 +3,11 @@ name = "cringy-blog-tasks"
 version = "0.0.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+tokio = { version = "1.22.0", features = ["rt-multi-thread", "macros", "sync"] }
+axum = "0.6.0-rc.5"
+tower-http = { version = "0.3.4", features = ["trace"] }
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+anyhow = "1.0.66"
+dotenv = "0.15.0"
