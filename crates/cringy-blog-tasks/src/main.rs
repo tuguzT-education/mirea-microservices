@@ -6,18 +6,20 @@
 
 use std::net::SocketAddr;
 
-use axum::{routing::get, Router, Server};
+use axum::{Router, Server};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use self::route::root;
+use self::route::task;
 
-mod route;
+pub mod data;
+pub mod route;
+pub mod utils;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     if dotenv::dotenv().is_err() {
-        tracing::info!(".env file not found, server may panic unexpectedly");
+        println!(".env file not found, server may panic unexpectedly");
     }
     tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(
@@ -28,7 +30,7 @@ async fn main() -> anyhow::Result<()> {
         .try_init()?;
 
     let app = Router::new()
-        .route("/", get(root))
+        .merge(task::all_merged())
         .layer(TraceLayer::new_for_http());
 
     let addr = &SocketAddr::from(([127, 0, 0, 1], 8080));

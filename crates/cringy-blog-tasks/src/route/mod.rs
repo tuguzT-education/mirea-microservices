@@ -1,3 +1,3 @@
-pub async fn root() -> &'static str {
-    "Hello, World!"
-}
+//! Routes of the microservice.
+
+pub mod task;
