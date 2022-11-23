@@ -1,11 +1,13 @@
 //! Data model of the microservice.
 
 use chrono::{DateTime, Utc};
+use diesel::prelude::*;
+use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Task data of the microservice.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Queryable)]
 pub struct Task {
     /// Identifier of the task.
     pub task_id: Uuid,
@@ -17,6 +19,16 @@ pub struct Task {
     pub deadline: Option<DateTime<Utc>>,
     /// Completion state of the task.
     pub completion: TaskCompletionState,
+}
+
+/// Task completion state.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, DbEnum)]
+#[DieselTypePath = "crate::schema::sql_types::TaskCompletionState"]
+pub enum TaskCompletionState {
+    /// The task is completed.
+    Completed,
+    /// The task is not completed.
+    NotCompleted,
 }
 
 /// Task data used to create task.
@@ -41,13 +53,4 @@ pub struct UpdateTask {
     pub deadline: Option<DateTime<Utc>>,
     /// Completion state of the task.
     pub completion: TaskCompletionState,
-}
-
-/// Task completion state.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub enum TaskCompletionState {
-    /// The task is completed.
-    Completed,
-    /// The task is not completed.
-    NotCompleted,
 }

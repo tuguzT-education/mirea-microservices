@@ -4,7 +4,9 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use derive_more::{Display, Error};
-use tokio::sync::RwLock;
+use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool};
+use diesel::PgConnection;
 use uuid::Uuid;
 
 use crate::data::model::{CreateTask, Task, TaskCompletionState};
@@ -31,55 +33,93 @@ pub trait TaskRepository {
 }
 
 /// Task repository in-memory implementation.
-#[derive(Debug, Default)]
-pub struct InMemoryTaskRepository(Arc<RwLock<Vec<Task>>>);
+#[derive(Debug)]
+pub struct LocalTaskRepository {
+    pool: Pool<ConnectionManager<PgConnection>>,
+}
+
+impl LocalTaskRepository {
+    /// Creates new local task repository.
+    pub fn new(pool: Pool<ConnectionManager<PgConnection>>) -> Self {
+        Self { pool }
+    }
+}
 
 #[async_trait]
-impl TaskRepository for InMemoryTaskRepository {
+impl TaskRepository for LocalTaskRepository {
     async fn get_all(&self) -> TaskRepoResult<Vec<Task>> {
-        let data = self.0.read().await;
-        Ok(data.clone())
+        use crate::schema::tasks::dsl::*;
+
+        let conn = &mut self.pool.get().unwrap();
+        let data = tasks.load(conn).unwrap();
+        Ok(data)
     }
 
     async fn get_one(&self, id: Uuid) -> TaskRepoResult<Task> {
-        let data = self.0.read().await;
-        let Some(task) = data.iter().find(|task| task.task_id == id) else {
+        use crate::schema::tasks::dsl::*;
+
+        let conn = &mut self.pool.get().unwrap();
+        let Ok(task) = tasks.filter(task_id.eq(id)).first(conn) else {
             return Err(TaskRepoError::NoTaskById);
         };
-        Ok(task.clone())
+        Ok(task)
     }
 
     async fn create_one(&self, create: CreateTask) -> TaskRepoResult<Task> {
-        let mut data = self.0.write().await;
-        let task = Task {
+        use crate::schema::tasks::dsl::*;
+        use chrono::{DateTime, Utc};
+
+        #[derive(Debug, Insertable)]
+        #[diesel(table_name = crate::schema::tasks)]
+        struct NewTask {
+            task_id: Uuid,
+            blog_id: Uuid,
+            name: String,
+            deadline: Option<DateTime<Utc>>,
+            completion: TaskCompletionState,
+        }
+
+        let conn = &mut self.pool.get().unwrap();
+        let task = NewTask {
             task_id: Uuid::new_v4(),
             blog_id: create.blog_id,
             name: create.name,
             deadline: create.deadline,
             completion: TaskCompletionState::NotCompleted,
         };
-        data.push(task.clone());
+        let task = diesel::insert_into(tasks)
+            .values(task)
+            .get_result(conn)
+            .unwrap();
         Ok(task)
     }
 
     async fn update_one(&self, id: Uuid, update: UpdateTask) -> TaskRepoResult<Task> {
-        let mut data = self.0.write().await;
-        let Some(task) = data.iter_mut().find(|task| task.task_id == id) else {
-            return Err(TaskRepoError::NoTaskById);
-        };
-        task.blog_id = update.blog_id;
-        task.name = update.name;
-        task.deadline = update.deadline;
-        task.completion = update.completion;
-        Ok(task.clone())
+        use crate::schema::tasks::dsl::*;
+
+        let conn = &mut self.pool.get().unwrap();
+        let task = diesel::update(tasks.find(id))
+            .set((
+                blog_id.eq(update.blog_id),
+                name.eq(update.name),
+                deadline.eq(update.deadline),
+                completion.eq(update.completion),
+            ))
+            .get_result(conn)
+            .unwrap();
+        Ok(task)
     }
 
     async fn delete_one(&self, id: Uuid) -> TaskRepoResult<Task> {
-        let mut data = self.0.write().await;
-        let Some(idx) = data.iter_mut().position(|task| task.task_id == id) else {
+        use crate::schema::tasks::dsl::*;
+
+        let conn = &mut self.pool.get().unwrap();
+        let Ok(task) = tasks.filter(task_id.eq(id)).first(conn) else {
             return Err(TaskRepoError::NoTaskById);
         };
-        let task = data.swap_remove(idx);
+        diesel::delete(tasks.filter(task_id.eq(id)))
+            .execute(conn)
+            .unwrap();
         Ok(task)
     }
 }

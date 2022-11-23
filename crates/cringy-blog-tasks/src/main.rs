@@ -4,28 +4,32 @@
 #![warn(clippy::all)]
 #![forbid(unsafe_code)]
 
+use std::env;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use anyhow::Context;
 use axum::{Router, Server};
 use chrono::{Duration, Utc};
+use diesel::r2d2::{ConnectionManager, Pool};
+use diesel::PgConnection;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use uuid::Uuid;
 
 use self::data::model::CreateTask;
-use self::data::repository::{DynTaskRepository, InMemoryTaskRepository};
+use self::data::repository::{DynTaskRepository, LocalTaskRepository};
 use self::route::task;
 
 pub mod data;
 pub mod route;
 pub mod utils;
 
+mod schema;
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    if dotenv::dotenv().is_err() {
-        println!(".env file not found, server may panic unexpectedly");
-    }
+    dotenv::dotenv().with_context(|| ".env file not found")?;
     tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(
             std::env::var("RUST_LOG")
@@ -34,7 +38,14 @@ async fn main() -> anyhow::Result<()> {
         .with(tracing_subscriber::fmt::layer())
         .try_init()?;
 
-    let task_repo = Arc::new(InMemoryTaskRepository::default()) as DynTaskRepository;
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+    let pool = Pool::builder()
+        .test_on_check_out(true)
+        .build(manager)
+        .with_context(|| "failed to establish connection to database")?;
+
+    let task_repo = Arc::new(LocalTaskRepository::new(pool)) as DynTaskRepository;
     let new_task = CreateTask {
         blog_id: Uuid::new_v4(),
         name: "New task".to_string(),
