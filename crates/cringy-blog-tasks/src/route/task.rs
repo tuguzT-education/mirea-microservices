@@ -10,6 +10,7 @@ pub fn all_merged() -> Router {
     Router::new()
         .merge(get_all())
         .merge(get_one())
+        .merge(create_one())
         .merge(update_one())
         .merge(delete_one())
 }
@@ -30,6 +31,15 @@ pub fn get_one() -> Router {
     }
 
     Router::new().route("/task/:id", get(handler))
+}
+
+/// Router for `POST /task/new`.
+pub fn create_one() -> Router {
+    async fn handler() -> impl IntoResponse {
+        "Create user here!"
+    }
+
+    Router::new().route("/task/new", post(handler))
 }
 
 /// Router for `POST /task/{id}`.
