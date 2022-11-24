@@ -1,0 +1,81 @@
+{
+    "$schema": "https://www.krakend.io/schema/v3.json",
+    "version": 3,
+    "name": "KrakenD - API Gateway",
+    "timeout": "3000ms",
+    "cache_ttl": "300s",
+    "output_encoding": "json",
+    "endpoints": [
+        {
+            "endpoint": "/v1/all",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/all",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ],
+                    "group": "blogs",
+                    "is_collection": true,
+                    "target": ""
+                },
+                {
+                    "url_pattern": "/task/all",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ],
+                    "group": "tasks",
+                    "is_collection": true,
+                    "target": ""
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/blogs",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/all",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ],
+                    "is_collection": true,
+                    "target": ""
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/tasks",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/task/all",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ],
+                    "is_collection": true,
+                    "target": ""
+                }
+            ]
+        }
+    ]
+}

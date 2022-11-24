@@ -1,0 +1,38 @@
+services:
+  server-blogs:
+    image: cringy-blog-blogs:latest
+    pull_policy: never
+    depends_on:
+      - postgres-blogs
+    environment:
+      - DATABASE_URL=postgres://postgres:password@postgres-blogs:5432/cringy-blog
+  postgres-blogs:
+    image: ubuntu/postgres:latest
+    environment:
+      - TZ=UTC
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=cringy-blog
+
+  server-tasks:
+    image: cringy-blog-tasks:latest
+    pull_policy: never
+    depends_on:
+      - postgres-tasks
+    environment:
+      - DATABASE_URL=postgres://postgres:password@postgres-tasks:5432/cringy-blog
+  postgres-tasks:
+    image: ubuntu/postgres:latest
+    environment:
+      - TZ=UTC
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=cringy-blog
+
+  krakend:
+    image: devopsfaith/krakend:latest
+    depends_on:
+      - server-blogs
+      - server-tasks
+    ports:
+      - 8080:8080
+    volumes:
+      - ./krakend.json:/etc/krakend/krakend.json
