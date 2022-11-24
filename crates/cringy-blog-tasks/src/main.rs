@@ -13,6 +13,7 @@ use axum::{Router, Server};
 use chrono::{Duration, Utc};
 use diesel::r2d2::{ConnectionManager, Pool};
 use diesel::PgConnection;
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use uuid::Uuid;
@@ -29,7 +30,9 @@ mod schema;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    dotenv::dotenv().with_context(|| ".env file not found")?;
+    if cfg!(debug_assertions) {
+        dotenv::dotenv().with_context(|| ".env file not found")?;
+    }
     tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(
             std::env::var("RUST_LOG")
@@ -44,6 +47,12 @@ async fn main() -> anyhow::Result<()> {
         .test_on_check_out(true)
         .build(manager)
         .with_context(|| "failed to establish connection to database")?;
+    if cfg!(not(debug_assertions)) {
+        const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
+
+        let connection = &mut pool.get()?;
+        connection.run_pending_migrations(MIGRATIONS).unwrap();
+    }
 
     let task_repo = Arc::new(LocalTaskRepository::new(pool)) as DynTaskRepository;
     let new_task = CreateTask {
@@ -57,7 +66,7 @@ async fn main() -> anyhow::Result<()> {
         .layer(TraceLayer::new_for_http())
         .with_state(task_repo);
 
-    let addr = &SocketAddr::from(([127, 0, 0, 1], 8080));
+    let addr = &SocketAddr::from(([0, 0, 0, 0], 8080));
     tracing::debug!("listening on {}", addr);
     Server::bind(addr).serve(app.into_make_service()).await?;
     Ok(())
