@@ -1,7 +1,6 @@
 services:
   server-blogs:
-    image: cringy-blog-blogs:latest
-    pull_policy: never
+    build: ./crates/cringy-blog-blogs
     depends_on:
       - postgres-blogs
     environment:
@@ -14,8 +13,7 @@ services:
       - POSTGRES_DB=cringy-blog
 
   server-tasks:
-    image: cringy-blog-tasks:latest
-    pull_policy: never
+    build: ./crates/cringy-blog-tasks
     depends_on:
       - postgres-tasks
     environment:

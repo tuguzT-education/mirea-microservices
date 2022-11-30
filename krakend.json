@@ -7,6 +7,180 @@
     "output_encoding": "json",
     "endpoints": [
         {
+            "endpoint": "/v1/blog/all",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/all",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ],
+                    "is_collection": true,
+                    "target": ""
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/blog/{id}",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/{id}",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/blog/new",
+            "method": "POST",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/new",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "POST",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/blog/{id}",
+            "method": "POST",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/{id}",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "POST",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/blog/{id}",
+            "method": "DELETE",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/blog/{id}",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "DELETE",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-blogs:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/task/all",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/task/all",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ],
+                    "is_collection": true,
+                    "target": ""
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/task/{id}",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/task/{id}",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "GET",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/task/new",
+            "method": "POST",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/task/new",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "POST",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/task/{id}",
+            "method": "POST",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/task/{id}",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "POST",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/v1/task/{id}",
+            "method": "DELETE",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/task/{id}",
+                    "encoding": "json",
+                    "sd": "static",
+                    "method": "DELETE",
+                    "disable_host_sanitize": false,
+                    "host": [
+                        "http://server-tasks:8080"
+                    ]
+                }
+            ]
+        },
+        {
             "endpoint": "/v1/all",
             "method": "GET",
             "output_encoding": "json",
@@ -34,44 +208,6 @@
                         "http://server-tasks:8080"
                     ],
                     "group": "tasks",
-                    "is_collection": true,
-                    "target": ""
-                }
-            ]
-        },
-        {
-            "endpoint": "/v1/blogs",
-            "method": "GET",
-            "output_encoding": "json",
-            "backend": [
-                {
-                    "url_pattern": "/blog/all",
-                    "encoding": "json",
-                    "sd": "static",
-                    "method": "GET",
-                    "disable_host_sanitize": false,
-                    "host": [
-                        "http://server-blogs:8080"
-                    ],
-                    "is_collection": true,
-                    "target": ""
-                }
-            ]
-        },
-        {
-            "endpoint": "/v1/tasks",
-            "method": "GET",
-            "output_encoding": "json",
-            "backend": [
-                {
-                    "url_pattern": "/task/all",
-                    "encoding": "json",
-                    "sd": "static",
-                    "method": "GET",
-                    "disable_host_sanitize": false,
-                    "host": [
-                        "http://server-tasks:8080"
-                    ],
                     "is_collection": true,
                     "target": ""
                 }
