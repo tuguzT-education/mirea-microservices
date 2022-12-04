@@ -1,6 +1,6 @@
 services:
   server:
-    image: cringy-blog-tasks:latest
+    build: .
     pull_policy: never
     depends_on:
       - postgres
@@ -8,9 +8,14 @@ services:
       - 8080:8080
     environment:
       - DATABASE_URL=postgres://postgres:password@postgres:5432/cringy-blog
+      - GELF_ADDR=172.24.0.4:12201
   postgres:
     image: ubuntu/postgres:latest
     environment:
       - TZ=UTC
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=cringy-blog
+networks:
+  default:
+    name: graylog-net
+    external: true

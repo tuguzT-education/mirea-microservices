@@ -13,6 +13,7 @@ RUN rm -rf /var/lib/apt/lists/*
 
 ENV DATABASE_URL postgres://postgres:password@localhost:5432/cringy-blog
 ENV RUST_LOG debug
+ENV GELF_ADDR 0.0.0.0:12201
 EXPOSE 8080
 
 COPY --from=builder /usr/local/cargo/bin/cringy-blog-tasks /usr/local/bin/cringy-blog-tasks

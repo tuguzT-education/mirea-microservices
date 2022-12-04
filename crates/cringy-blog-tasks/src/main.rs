@@ -33,11 +33,16 @@ async fn main() -> anyhow::Result<()> {
     if cfg!(debug_assertions) {
         dotenv::dotenv().with_context(|| ".env file not found")?;
     }
+
+    let log_directives = std::env::var("RUST_LOG").expect("RUST_LOG must be set");
+    let gelf_addr = std::env::var("GELF_ADDR").expect("GELF_ADDR must be set");
+    let (gelf, mut conn) = tracing_gelf::Logger::builder()
+        .connect_udp(gelf_addr)
+        .with_context(|| "failed to initialize GELF logger")?;
+    tokio::spawn(async move { conn.connect().await });
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new(
-            std::env::var("RUST_LOG")
-                .unwrap_or_else(|_| "cringy_blog_tasks=debug,tower_http=debug".into()),
-        ))
+        .with(tracing_subscriber::EnvFilter::new(log_directives))
+        .with(gelf)
         .with(tracing_subscriber::fmt::layer())
         .try_init()?;
 

@@ -1,6 +1,6 @@
 services:
   server:
-    image: cringy-blog-blogs:latest
+    build: .
     pull_policy: never
     depends_on:
       - postgres
