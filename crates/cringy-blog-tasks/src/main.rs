@@ -73,6 +73,15 @@ async fn main() -> anyhow::Result<()> {
 
     let addr = &SocketAddr::from(([0, 0, 0, 0], 8080));
     tracing::debug!("listening on {}", addr);
-    Server::bind(addr).serve(app.into_make_service()).await?;
+    Server::bind(addr)
+        .serve(app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
     Ok(())
+}
+
+async fn shutdown_signal() {
+    tokio::signal::ctrl_c()
+        .await
+        .expect("expect tokio signal ctrl-c")
 }
