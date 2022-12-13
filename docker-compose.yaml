@@ -2,28 +2,50 @@ services:
   server-blogs:
     build: ./crates/cringy-blog-blogs
     depends_on:
-      - postgres-blogs
+      postgres-blogs:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgres://postgres:password@postgres-blogs:5432/cringy-blog
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
   postgres-blogs:
     image: ubuntu/postgres:latest
     environment:
       - TZ=UTC
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=cringy-blog
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   server-tasks:
     build: ./crates/cringy-blog-tasks
     depends_on:
-      - postgres-tasks
+      postgres-tasks:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgres://postgres:password@postgres-tasks:5432/cringy-blog
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
   postgres-tasks:
     image: ubuntu/postgres:latest
     environment:
       - TZ=UTC
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=cringy-blog
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   krakend:
     image: devopsfaith/krakend:latest
@@ -34,3 +56,8 @@ services:
       - 8080:8080
     volumes:
       - ./krakend.json:/etc/krakend/krakend.json
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/__health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5

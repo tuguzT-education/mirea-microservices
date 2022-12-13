@@ -20,7 +20,7 @@ use uuid::Uuid;
 
 use self::data::model::CreateTask;
 use self::data::repository::{DynTaskRepository, LocalTaskRepository};
-use self::route::task;
+use self::route::{health, task};
 
 pub mod data;
 pub mod route;
@@ -68,8 +68,9 @@ async fn main() -> anyhow::Result<()> {
     task_repo.create_one(new_task).await?;
     let app = Router::new()
         .merge(task::all_merged())
-        .layer(TraceLayer::new_for_http())
-        .with_state(task_repo);
+        .with_state(task_repo)
+        .merge(health::health())
+        .layer(TraceLayer::new_for_http());
 
     let addr = &SocketAddr::from(([0, 0, 0, 0], 8080));
     tracing::debug!("listening on {}", addr);

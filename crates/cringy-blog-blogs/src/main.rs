@@ -19,7 +19,7 @@ use uuid::Uuid;
 
 use self::data::model::CreateBlog;
 use self::data::repository::{DynBlogRepository, LocalBlogRepository};
-use self::route::blog;
+use self::route::{blog, health};
 
 pub mod data;
 pub mod route;
@@ -61,11 +61,21 @@ async fn main() -> anyhow::Result<()> {
     task_repo.create_one(new_task).await?;
     let app = Router::new()
         .merge(blog::all_merged())
-        .layer(TraceLayer::new_for_http())
-        .with_state(task_repo);
+        .with_state(task_repo)
+        .merge(health::health())
+        .layer(TraceLayer::new_for_http());
 
     let addr = &SocketAddr::from(([0, 0, 0, 0], 8080));
     tracing::debug!("listening on {}", addr);
-    Server::bind(addr).serve(app.into_make_service()).await?;
+    Server::bind(addr)
+        .serve(app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
     Ok(())
+}
+
+async fn shutdown_signal() {
+    tokio::signal::ctrl_c()
+        .await
+        .expect("expect tokio signal ctrl-c")
 }
