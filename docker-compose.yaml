@@ -52,6 +52,7 @@ services:
     depends_on:
       - server-blogs
       - server-tasks
+      - jaeger
     ports:
       - 8080:8080
     volumes:
@@ -61,3 +62,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.40
+    ports:
+      - 16686:16686 # serve frontend
+      # - 14268:14268 # accept jaeger.thrift directly from clients
