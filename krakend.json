@@ -238,6 +238,17 @@
                     "tag_statuscode": false
                 }
             }
+        },
+        "telemetry/influx": {
+            "address": "http://influxdb:8086",
+            "ttl": "25s",
+            "buffer_size": 100,
+            "username": "krakend",
+            "password": "krakend"
+        },
+        "telemetry/metrics": {
+            "collection_time": "15s",
+            "listen_address": ":8090"
         }
     }
 }
