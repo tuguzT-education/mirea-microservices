@@ -58,7 +58,14 @@
                         "http://server-blogs:8080"
                     ]
                 }
-            ]
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "jwk_url": "http://keycloak:8080/realms/krakend/protocol/openid-connect/certs",
+                    "disable_jwk_security": true
+                }
+            }
         },
         {
             "endpoint": "/v1/blog/{id}",
@@ -75,7 +82,14 @@
                         "http://server-blogs:8080"
                     ]
                 }
-            ]
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "jwk_url": "http://keycloak:8080/realms/krakend/protocol/openid-connect/certs",
+                    "disable_jwk_security": true
+                }
+            }
         },
         {
             "endpoint": "/v1/blog/{id}",
@@ -92,7 +106,14 @@
                         "http://server-blogs:8080"
                     ]
                 }
-            ]
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "jwk_url": "http://keycloak:8080/realms/krakend/protocol/openid-connect/certs",
+                    "disable_jwk_security": true
+                }
+            }
         },
         {
             "endpoint": "/v1/task/all",
@@ -145,7 +166,14 @@
                         "http://server-tasks:8080"
                     ]
                 }
-            ]
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "jwk_url": "http://keycloak:8080/realms/krakend/protocol/openid-connect/certs",
+                    "disable_jwk_security": true
+                }
+            }
         },
         {
             "endpoint": "/v1/task/{id}",
@@ -162,7 +190,14 @@
                         "http://server-tasks:8080"
                     ]
                 }
-            ]
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "jwk_url": "http://keycloak:8080/realms/krakend/protocol/openid-connect/certs",
+                    "disable_jwk_security": true
+                }
+            }
         },
         {
             "endpoint": "/v1/task/{id}",
@@ -179,7 +214,14 @@
                         "http://server-tasks:8080"
                     ]
                 }
-            ]
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "jwk_url": "http://keycloak:8080/realms/krakend/protocol/openid-connect/certs",
+                    "disable_jwk_security": true
+                }
+            }
         },
         {
             "endpoint": "/v1/all",
